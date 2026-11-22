@@ -76,8 +76,9 @@ body.tt-app {
 .tt-toolbar--side {
   flex-direction: column;
   align-items: stretch;
+  align-content: flex-start;
   gap: 0.5rem;
-  inline-size: auto;
+  flex: 0 0 18rem; /* fixed palette column so the canvas shares the row */
   border-inline-end: 1px solid #333;
 }
 
@@ -97,6 +98,7 @@ body.tt-app {
 /* ------------------------------------------------------------------ */
 .tt-page-canvas {
   flex: 1 1 auto;
+  min-inline-size: 0; /* shrink inside the flex row instead of overflowing */
   display: grid;
   grid-template-columns: repeat(40, 1fr);
   grid-template-rows: repeat(24, 1fr);
@@ -224,6 +226,7 @@ body.tt-app {
   }
 
   .tt-toolbar--side {
+    flex: 1 1 auto; /* undo the desktop fixed basis */
     flex-direction: row;
     flex-wrap: wrap;
     inline-size: 100%;

@@ -11,6 +11,7 @@
   "devDependencies": {
     "fast-check": "^3.19.0",
     "jsdom": "^31.0.1",
+    "playwright": "^1.65.1",
     "vitest": "^2.1.0"
   }
 }

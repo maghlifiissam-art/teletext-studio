@@ -11,7 +11,7 @@
  * testable under jsdom without a browser.
  */
 
-import { COLS, ROWS, PALETTE, CHARSET } from "./model.js";
+import { COLS, ROWS, PALETTE, CHARSET, getPage, switchMode, toggleSextant } from "./model.js";
 import { renderToDOM } from "./renderer.js";
 
 /** UI strings in both supported languages (Req. 12.1 / 12.2). */
@@ -200,7 +200,13 @@ export function wireCanvas(doc, canvas, ctx) {
     const row = Number(cellEl.dataset.row);
     const col = Number(cellEl.dataset.col);
     editor.selectCell(row, col); // Req. 11.1: tap selects the cell
-    if (editor.state.mode === "mosaic" || canvas.getAttribute("data-mode") === "mosaic") {
+    if (canvas.getAttribute("data-mode") === "mosaic") {
+      // A mosaic-mode tap edits mosaic content: switch the cell into mosaic
+      // mode first when it still holds text, then toggle the tapped sextant.
+      const page = getPage(editor.state.current, editor.state.activePage);
+      if (page && page.cells[row][col].mode !== "mosaic") {
+        page.cells[row][col] = switchMode(page.cells[row][col], "mosaic");
+      }
       const rect = cellEl.getBoundingClientRect();
       const bit = mosaic.sextantFromPoint(rect, event.clientX, event.clientY);
       mosaic.toggleSextantAt(row, col, bit);
