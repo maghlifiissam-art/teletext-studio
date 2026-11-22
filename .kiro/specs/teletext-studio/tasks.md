@@ -99,8 +99,8 @@ Teletext Studio is a client-side web application with no build step, written in 
     - Verify phase toggles every 500ms and all flashing cells share one phase
     - _Requirements: 4.2_
 
-- [ ] 6. Implement the Editor and Mosaic_Editor in `scripts/editor.js`
-  - [ ] 6.1 Implement Editor state, cursor, colour, mode, attribute, page management, and Mosaic_Editor
+- [x] 6. Implement the Editor and Mosaic_Editor in `scripts/editor.js`
+  - [x] 6.1 Implement Editor state, cursor, colour, mode, attribute, page management, and Mosaic_Editor
     - Implement `EditorState` (current PageSet, activePage, cursor, selection, fg, bg)
     - Implement `selectCell(row, col)`, `enterChar(ch)` (write + advance cursor with wrap: (r,39)→(r+1,0), (23,39)→(0,0); no-op if no selection), `deleteCell()` (clear to space; no-op if no selection)
     - Implement `setFg(c)`, `setBg(c)`, `applyFgToSelection(c)`, `applyBgToSelection(c)` for region colour application
@@ -108,43 +108,43 @@ Teletext Studio is a client-side web application with no build step, written in 
     - Implement `createPage()` (assign unique number or error if full), `deletePage(n)`, `renamePage(oldN, newN)` (reject out-of-range or duplicate with error, leave state unchanged), `setFastext(page, key, target)`
     - Implement `MosaicEditor` with `toggleSextantAt(row, col, bit)` and `sextantFromPoint(cellRect, x, y)` deriving the sextant bit (0..5) from pointer/touch position in the 2×3 grid
     - _Requirements: 1.2, 1.3, 1.4, 1.6, 1.7, 1.8, 2.3, 2.4, 2.5, 2.6, 3.2, 3.4, 3.5, 3.6, 4.3, 4.4, 5.5, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 7.4_
-  - [ ]* 6.2 Write property test for cursor selection placing the cursor
+  - [x]* 6.2 Write property test for cursor selection placing the cursor
     - **Property 4: Cursor selection places the cursor** — `selectCell(r, c)` sets the cursor to exactly `{row: r, col: c}`
     - **Validates: Requirements 1.2**
-  - [ ]* 6.3 Write property test for character entry writing the selected cell
+  - [x]* 6.3 Write property test for character entry writing the selected cell
     - **Property 5: Character entry writes the selected cell** — `enterChar` writes the character (mapped through Charset) into the selected cell
     - **Validates: Requirements 1.3**
-  - [ ]* 6.4 Write property test for deletion clearing to space
+  - [x]* 6.4 Write property test for deletion clearing to space
     - **Property 6: Deletion clears to space** — `deleteCell` sets the selected cell's character to space (0x20)
     - **Validates: Requirements 1.4**
-  - [ ]* 6.5 Write property test for cursor advancing with wrap
+  - [x]* 6.5 Write property test for cursor advancing with wrap
     - **Property 7: Cursor advances with wrap** — after writing a character, the cursor moves to the row-major successor with wrap at row and page boundaries
     - **Validates: Requirements 1.6**
-  - [ ]* 6.6 Write property test for no selection being a no-op
+  - [x]* 6.6 Write property test for no selection being a no-op
     - **Property 8: No selection is a no-op** — when cursor is null, `enterChar` and `deleteCell` leave the Page byte-identical
     - **Validates: Requirements 1.7, 1.8**
-  - [ ]* 6.7 Write property test for colour selection applying to subsequent entries
+  - [x]* 6.7 Write property test for colour selection applying to subsequent entries
     - **Property 9: Colour selection applies to subsequent entries** — after `setFg(c)`/`setBg(c)`, every subsequently entered character has that colour until changed
     - **Validates: Requirements 2.3, 2.4**
-  - [ ]* 6.8 Write property test for region colour application
+  - [x]* 6.8 Write property test for region colour application
     - **Property 10: Region colour application** — `applyFgToSelection(c)`/`applyBgToSelection(c)` sets the colour on exactly the cells inside the region, leaving outside cells unchanged
     - **Validates: Requirements 2.5, 2.6**
-  - [ ]* 6.9 Write property test for attribute flags applying to the selection
+  - [x]* 6.9 Write property test for attribute flags applying to the selection
     - **Property 15: Attribute flags apply to the selection** — `setFlashing(b)` sets `flashing == b` and `setConcealed(b)` sets `concealed == b` on exactly the selected cells
     - **Validates: Requirements 4.3, 4.4, 5.5**
-  - [ ]* 6.10 Write property test for new page assigning a unique in-range number or erroring when full
+  - [x]* 6.10 Write property test for new page assigning a unique in-range number or erroring when full
     - **Property 19: New page assigns a unique in-range number, or errors when full** — returns an unused number in 100..899 and adds a page; when all 800 are assigned, signals an error and leaves the PageSet unchanged
     - **Validates: Requirements 6.2, 6.7**
-  - [ ]* 6.11 Write property test for invalid rename being rejected and preserving state
+  - [x]* 6.11 Write property test for invalid rename being rejected and preserving state
     - **Property 20: Invalid rename is rejected and preserves state** — out-of-range or duplicate target is rejected with an error and the PageSet is unchanged
     - **Validates: Requirements 6.3, 6.6**
-  - [ ]* 6.12 Write property test for Fastext target assignment
+  - [x]* 6.12 Write property test for Fastext target assignment
     - **Property 25: Fastext target assignment** — after `setFastext(page, key, target)`, the page's `fastext[key]` equals the target
     - **Validates: Requirements 7.4**
-  - [ ]* 6.13 Write property test for mosaic geometry
+  - [x]* 6.13 Write property test for mosaic geometry
     - **Property 12: Mosaic geometry** — a mosaic cell has exactly six sextant positions arranged as 2 columns × 3 rows, pattern is an integer in 0..63
     - **Validates: Requirements 3.1**
-  - [ ]* 6.14 Write unit test for mosaic input from pointer and touch events
+  - [x]* 6.14 Write unit test for mosaic input from pointer and touch events
     - Verify `sextantFromPoint` maps both pointer and touch coordinates to the correct sextant bit (0..5) in the 2×3 grid
     - _Requirements: 3.5_
 
