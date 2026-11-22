@@ -233,27 +233,27 @@ Teletext Studio is a client-side web application with no build step, written in 
     - Wire the Exporter and URL_Encoder to their UI triggers (PNG export button, share-URL button)
     - _Requirements: 9.3, 10.1, 10.5, 10.6_
 
-- [ ] 14. Refine mobile/touch responsive CSS in `styles/main.css`
-  - [ ] 14.1 Refine responsive layout, touch targets, and no-horizontal-scroll behaviour
+- [x] 14. Refine mobile/touch responsive CSS in `styles/main.css`
+  - [x] 14.1 Refine responsive layout, touch targets, and no-horizontal-scroll behaviour
     - Ensure all non-canvas interactive controls are at least 44×44 CSS px (Req. 11.2)
     - Ensure no horizontal scrolling below 768px viewport width (Req. 11.4); scale the canvas to fit
     - Verify the soft input controls are reachable and usable via touch only (Req. 11.5)
     - _Requirements: 11.2, 11.4, 11.5_
 
-- [ ] 15. Integration and end-to-end wiring
-  - [ ] 15.1 Wire all components together and verify end-to-end operation
+- [x] 15. Integration and end-to-end wiring
+  - [x] 15.1 Wire all components together and verify end-to-end operation
     - Update `index.html` and `scripts/main.js` to load all modules and connect the full editing → rendering → navigation → export → URL-share flow
     - Verify the app operates with no build step as static files (Req. 10.2, 10.5)
     - Verify all interactive features work after initial load with no network connection (Req. 10.6)
     - _Requirements: 10.1, 10.2, 10.5, 10.6_
-  - [ ]* 15.2 Write integration and smoke tests
+  - [x]* 15.2 Write integration and smoke tests
     - Test offline operation after initial load (Req. 10.6); assert no runtime third-party network calls (Req. 10.4)
     - Verify no-build static hosting works (Req. 10.2, 10.5); verify touch targets ≥ 44×44 px (Req. 11.2)
     - Verify no horizontal scroll below 768px (Req. 11.4); verify touch-only operation for core actions (Req. 11.5)
     - Verify default UI is English/LTR and the language toggle is present (Req. 12.1, 12.5)
     - _Requirements: 10.2, 10.4, 10.5, 10.6, 11.2, 11.4, 11.5, 12.1, 12.5_
 
-- [ ] 16. Final checkpoint - Ensure all tests pass
+- [x] 16. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

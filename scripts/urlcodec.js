@@ -284,14 +284,22 @@ export function deserialize(bytes) {
 
 /** deflate-raw via the Compression Streams API (async). */
 export async function compress(bytes) {
-  const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
+  const cs = new CompressionStream("deflate-raw");
+  const writer = cs.writable.getWriter();
+  const done = new Response(cs.readable).arrayBuffer();
+  await writer.write(bytes);
+  await writer.close();
+  return new Uint8Array(await done);
 }
 
 /** inflate-raw via the Compression Streams API (async). Throws on corrupt input. */
 export async function decompress(bytes) {
-  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
+  const ds = new DecompressionStream("deflate-raw");
+  const writer = ds.writable.getWriter();
+  const done = new Response(ds.readable).arrayBuffer();
+  await writer.write(bytes);
+  await writer.close();
+  return new Uint8Array(await done);
 }
 
 /**
