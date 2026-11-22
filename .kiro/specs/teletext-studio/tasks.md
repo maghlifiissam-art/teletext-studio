@@ -68,8 +68,8 @@ Teletext Studio is a client-side web application with no build step, written in 
 - [x] 3. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Implement the Renderer in `scripts/renderer.js`
-  - [ ] 4.1 Implement `computeCellVisual`, `renderToDOM`, and `renderToCanvas`
+- [x] 4. Implement the Renderer in `scripts/renderer.js`
+  - [x] 4.1 Implement `computeCellVisual`, `renderToDOM`, and `renderToCanvas`
     - Implement `computeCellVisual(cell, opts)` returning a `CellVisual` (content, mosaic pattern, visible fg/bg, visibility flag) — the pure single source of truth for what a cell shows
     - Apply rendering rules: background in `PALETTE[cell.bg]`, foreground in `PALETTE[cell.fg]`; text mode draws `codeToUnicode(char)`, mosaic mode draws filled sextants in fg / empty in bg
     - Flashing: when `flashOn === false`, a flashing cell shows only its background; Conceal: when `revealed === false`, a concealed cell shows only its background
@@ -89,13 +89,13 @@ Teletext Studio is a client-side web application with no build step, written in 
     - **Property 27: Export dimension invariant** — `renderToCanvas` produces exactly 480×240 pixels, each cell at a 12×10 region at position (col×12, row×10)
     - **Validates: Requirements 8.2**
 
-- [ ] 5. Implement the FlashController in `scripts/flash.js`
-  - [ ] 5.1 Implement `FlashController` with a single timer
+- [x] 5. Implement the FlashController in `scripts/flash.js`
+  - [x] 5.1 Implement `FlashController` with a single timer
     - Implement `start(onTick)` toggling `flashOn` every 500ms (one on/off cycle per second, 0.5s visible / 0.5s hidden) using a single interval/rAF accumulator
     - Implement `stop()` to clear the timer
     - The single timer guarantees all flashing cells share one phase synchronously
     - _Requirements: 4.2_
-  - [ ]* 5.2 Write unit test for flashing cadence using a controllable fake clock
+  - [x]* 5.2 Write unit test for flashing cadence using a controllable fake clock
     - Verify phase toggles every 500ms and all flashing cells share one phase
     - _Requirements: 4.2_
 
@@ -148,7 +148,7 @@ Teletext Studio is a client-side web application with no build step, written in 
     - Verify `sextantFromPoint` maps both pointer and touch coordinates to the correct sextant bit (0..5) in the 2×3 grid
     - _Requirements: 3.5_
 
-- [ ] 7. Checkpoint - Ensure all tests pass
+- [x] 7. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 8. Implement the Navigator in `scripts/navigator.js`
