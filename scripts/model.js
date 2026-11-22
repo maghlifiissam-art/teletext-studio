@@ -117,7 +117,10 @@ export function defaultCell() {
 /**
  * Switch a cell's mode. Preserves fg and bg (Req. 3.4) and initialises the
  * mosaic pattern to 0 (entering mosaic mode starts from a blank pattern,
- * Req. 3.6). Returns a new cell; the argument is not mutated.
+ * Req. 3.6). Entering mosaic mode also resets char to space: the character
+ * is text-mode content, and dropping it keeps every reachable mosaic cell
+ * inside the serialization format's 3-byte cell budget (Req. 9.7). Returns
+ * a new cell; the argument is not mutated.
  * @param {object} cell
  * @param {"text"|"mosaic"} mode
  * @returns {object}
@@ -126,6 +129,7 @@ export function switchMode(cell, mode) {
   return {
     ...cell,
     mode,
+    char: mode === "mosaic" ? 0x20 : cell.char,
     mosaic: 0,
   };
 }

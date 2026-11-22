@@ -76,16 +76,16 @@ Teletext Studio is a client-side web application with no build step, written in 
     - Implement `renderToDOM(container, page, opts)` rendering a DOM CSS-grid of 960 cell elements
     - Implement `renderToCanvas(ctx, page, opts)` at 12×10 px per cell (480×240 total) with sextant geometry `SEXTANT_COL_W=[6,6]`, `SEXTANT_ROW_H=[4,3,3]`
     - _Requirements: 2.7, 3.3, 4.1, 5.1, 5.2, 8.2_
-  - [ ]* 4.2 Write property test for render using cell foreground and background
+  - [x]* 4.2 Write property test for render using cell foreground and background
     - **Property 11: Render uses cell foreground and background** — rendered fg equals `PALETTE[cell.fg]`, bg equals `PALETTE[cell.bg]`; mosaic set sextants draw in fg, clear in bg
     - **Validates: Requirements 2.7, 3.3**
-  - [ ]* 4.3 Write property test for flashing visibility following the phase
+  - [x]* 4.3 Write property test for flashing visibility following the phase
     - **Property 16: Flashing visibility follows the phase** — a flashing cell's content is visible when `flashOn` is true and hidden when false; non-flashing cells are unaffected
     - **Validates: Requirements 4.1**
-  - [ ]* 4.4 Write property test for concealed visibility following reveal
+  - [x]* 4.4 Write property test for concealed visibility following reveal
     - **Property 17: Concealed visibility follows reveal (round trip)** — concealed content is hidden when not revealed, shown when revealed; revealing then hiding restores hidden state; non-concealed cells are unaffected
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4**
-  - [ ]* 4.5 Write property test for export dimension invariant
+  - [x]* 4.5 Write property test for export dimension invariant
     - **Property 27: Export dimension invariant** — `renderToCanvas` produces exactly 480×240 pixels, each cell at a 12×10 region at position (col×12, row×10)
     - **Validates: Requirements 8.2**
 
@@ -151,37 +151,37 @@ Teletext Studio is a client-side web application with no build step, written in 
 - [x] 7. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 8. Implement the Navigator in `scripts/navigator.js`
-  - [ ] 8.1 Implement Navigator with `goTo`, `activateFastext`, `requestReveal`, `requestHide`
+- [x] 8. Implement the Navigator in `scripts/navigator.js`
+  - [x] 8.1 Implement Navigator with `goTo`, `activateFastext`, `requestReveal`, `requestHide`
     - Implement `goTo(n)` — display the page if it exists (Req. 7.1); if not, show page-not-found indicator and stay on current page (Req. 7.6)
     - Implement `activateFastext(page, key)` — navigate to the targeted page number if it exists (Req. 7.3); if target is missing/null, show page-not-found indicator and stay (Req. 7.5)
     - Implement `requestReveal()` / `requestHide()` to toggle concealed cell visibility on the current page
     - Expose exactly four Fastext keys in the fixed order red, green, yellow, cyan (Req. 7.2)
     - _Requirements: 5.3, 5.4, 7.1, 7.2, 7.3, 7.5, 7.6_
-  - [ ]* 8.2 Write property test for navigation to an existing target succeeding
+  - [x]* 8.2 Write property test for navigation to an existing target succeeding
     - **Property 23: Navigation to an existing target succeeds** — `goTo(n)` succeeds and sets current to n for existing pages; `activateFastext` succeeds and sets current to t for existing targets
     - **Validates: Requirements 7.1, 7.3**
-  - [ ]* 8.3 Write property test for four Fastext keys
+  - [x]* 8.3 Write property test for four Fastext keys
     - **Property 24: Four Fastext keys** — the Navigator exposes exactly four Fastext keys in the fixed order red, green, yellow, cyan
     - **Validates: Requirements 7.2**
-  - [ ]* 8.4 Write property test for missing navigation target being rejected
+  - [x]* 8.4 Write property test for missing navigation target being rejected
     - **Property 26: Missing navigation target is rejected, current unchanged** — direct entry or Fastext activation whose target does not exist (or is null) is rejected with a page-not-found indicator and current page unchanged
     - **Validates: Requirements 7.5, 7.6**
 
-- [ ] 9. Implement the Exporter in `scripts/exporter.js`
-  - [ ] 9.1 Implement `exportPng` with canvas rendering and download
+- [x] 9. Implement the Exporter in `scripts/exporter.js`
+  - [x] 9.1 Implement `exportPng` with canvas rendering and download
     - Call `renderToCanvas` with `flashOn=true` and `revealed=true` (Req. 8.3, 8.4), then `canvas.toBlob('image/png')` and trigger a download (Req. 8.1)
     - On `toBlob` failure or unavailability, notify the designer with an "export failed" error and leave the page unchanged (Req. 8.5)
     - _Requirements: 8.1, 8.3, 8.4, 8.5_
-  - [ ]* 9.2 Write property test for export rendering fully visible
+  - [x]* 9.2 Write property test for export rendering fully visible
     - **Property 28: Export renders fully visible** — flashing or concealed cells render with content shown (equivalent to `flashOn == true` and `revealed == true`)
     - **Validates: Requirements 8.3, 8.4**
-  - [ ]* 9.3 Write unit test for PNG export error path when toBlob fails
+  - [x]* 9.3 Write unit test for PNG export error path when toBlob fails
     - Verify the exporter surfaces an "export failed" error and leaves the page unchanged when `toBlob` is unavailable or throws
     - _Requirements: 8.5_
 
-- [ ] 10. Implement the URL codec in `scripts/urlcodec.js`
-  - [ ] 10.1 Implement `URL_Encoder` and `URL_Decoder` with serialize, compress, and base64url
+- [x] 10. Implement the URL codec in `scripts/urlcodec.js`
+  - [x] 10.1 Implement `URL_Encoder` and `URL_Decoder` with serialize, compress, and base64url
     - Implement `serialize(ps)` producing the versioned byte format (magic "TT", version 1, pageCount varint, per-page header + cell stream with RUN_DEFAULT/CELL_TEXT/CELL_MOSAIC tokens and packed attrs byte)
     - Implement `deserialize(bytes)` reversing each token; reject bad magic/version/truncation with an error + empty PageSet
     - Implement `compress`/`decompress` via `CompressionStream`/`DecompressionStream` with `deflate-raw` format
@@ -190,23 +190,23 @@ Teletext Studio is a client-side web application with no build step, written in 
     - Implement `encodePage(p)` → single-page URL within the 4000-char limit (Req. 9.7)
     - Implement `decode(url)` → reverse pipeline; on invalid/altered input, return empty PageSet with error (Req. 9.5)
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8_
-  - [ ]* 10.2 Write property test for URL encode/decode round trip
+  - [x]* 10.2 Write property test for URL encode/decode round trip
     - **Property 29: URL encode/decode round trip** — `decode(encode(ps))` is structurally identical to ps (same page count, numbers, Fastext targets, and all cell fields)
     - **Validates: Requirements 9.2, 9.3, 9.4, 9.6**
-  - [ ]* 10.3 Write property test for invalid URL decoding to an empty Page_Set
+  - [x]* 10.3 Write property test for invalid URL decoding to an empty Page_Set
     - **Property 33: Invalid URL decodes to an empty Page_Set** — truncated, wrong magic, unsupported version, or corrupted payloads signal an invalid-URL error and load an empty PageSet
     - **Validates: Requirements 9.5**
-  - [ ]* 10.4 Write property test for single-page URL size bound
+  - [x]* 10.4 Write property test for single-page URL size bound
     - **Property 30: Single-page URL size bound** — `encodePage` produces a URL no more than 4000 characters for any Page
     - **Validates: Requirements 9.7**
-  - [ ]* 10.5 Write property test for page-set URL size bound on success
+  - [x]* 10.5 Write property test for page-set URL size bound on success
     - **Property 31: Page-set URL size bound on success** — for any PageSet that encodes without the too-large error, the resulting URL is no more than 30000 characters
     - **Validates: Requirements 9.1**
-  - [ ]* 10.6 Write property test for oversized page set being rejected
+  - [x]* 10.6 Write property test for oversized page set being rejected
     - **Property 32: Oversized page set is rejected** — for any PageSet whose encoded URL would exceed 30000 characters, `encode` signals a "too large to share" error and produces no URL
     - **Validates: Requirements 9.8**
 
-- [ ] 11. Checkpoint - Ensure all tests pass
+- [x] 11. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Implement UI wiring, language/RTL toggle, and mobile/touch soft input in `scripts/ui.js`
