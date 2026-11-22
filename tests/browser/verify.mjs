@@ -187,9 +187,34 @@ try {
   check("mobile touch targets >= 44px", targetTooSmall === 0, `${targetTooSmall} too small`);
   // Mobile editing: tap selects and soft palette enters a character.
   await mobile.locator(".tt-cell").nth(0).tap();
+  // Palette is collapsed on mobile: open it, then tap a character.
+  await mobile.locator(".tt-palette-summary").tap();
   await mobile.locator(".tt-char", { hasText: "A" }).first().tap();
   const mobileCell = await mobile.locator('[data-row="0"][data-col="0"]').textContent();
   check("mobile tap + soft input enters a character", mobileCell === "A", `got ${JSON.stringify(mobileCell)}`);
+
+  // Initial viewport: the canvas must be visible without scrolling, together
+  // with the editing controls (canvas top edge within the first viewport).
+  const fresh = await browser.newPage({ viewport: { width: 375, height: 700 }, hasTouch: true });
+  await fresh.goto(BASE + "/", { waitUntil: "networkidle" });
+  const canvasBox = await fresh.locator("#page-canvas").boundingBox();
+  check(
+    "canvas visible in initial 375x700 viewport",
+    canvasBox !== null && canvasBox.y < 700 && canvasBox.height > 150,
+    JSON.stringify(canvasBox)
+  );
+  const paletteOpen = await fresh.locator(".tt-palette").evaluate((el) => el.open);
+  check("char palette collapsed by default on mobile", paletteOpen === false);
+  // Cursor orientation: tap a cell and confirm the cursor frame is applied.
+  await fresh.locator('[data-row="2"][data-col="2"]').tap();
+  const cursorMarked = await fresh
+    .locator('[data-row="2"][data-col="2"]')
+    .evaluate((el) => el.classList.contains("tt-cursor"));
+  check("tapped cell shows the cursor frame", cursorMarked === true);
+  const statusText = await fresh.locator(".tt-status-page").textContent();
+  check("status shows the current page", /100/.test(statusText), statusText);
+  await fresh.screenshot({ path: "/downloads/teletext-mobile-initial.png" });
+  await fresh.close();
 
   // 14. No uncaught page errors through the whole run.
   check("no page errors", errors.length === 0, errors.slice(0, 3).join(" | "));

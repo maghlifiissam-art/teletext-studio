@@ -31,6 +31,10 @@ export const STRINGS = {
     "page-not-found": "Page not found",
     "export-failed": "Export failed",
     "too-large": "Too large to share",
+    page: "Page",
+    "text-colour": "Text",
+    "bg-colour": "BG",
+    palette: "Characters",
   },
   ar: {
     "lang-toggle": "English",
@@ -47,6 +51,10 @@ export const STRINGS = {
     "page-not-found": "الصفحة غير موجودة",
     "export-failed": "فشل التصدير",
     "too-large": "كبير جداً للمشاركة",
+    page: "صفحة",
+    "text-colour": "النص",
+    "bg-colour": "الخلفية",
+    palette: "الحروف",
   },
 };
 
@@ -136,12 +144,25 @@ export function buildTopToolbar(doc, toolbar, ctx) {
   const status = doc.createElement("span");
   status.className = "tt-status";
   status.setAttribute("role", "status");
+  const statusPage = doc.createElement("span");
+  statusPage.className = "tt-status-page";
+  const statusMode = doc.createElement("span");
+  statusMode.className = "tt-status-mode";
+  const fgChip = doc.createElement("span");
+  fgChip.className = "tt-chip tt-chip--fg";
+  fgChip.title = "foreground";
+  const bgChip = doc.createElement("span");
+  bgChip.className = "tt-chip tt-chip--bg";
+  bgChip.title = "background";
+  const statusMsg = doc.createElement("span");
+  statusMsg.className = "tt-status-msg";
+  status.append(statusPage, statusMode, fgChip, bgChip, statusMsg);
 
   toolbar.append(
     modeText, modeMosaic, flash, conceal, reveal,
     exportPng, share, newPage, deletePage, gotoWrap, status
   );
-  return { status, gotoInput };
+  return { status, statusPage, statusMode, fgChip, bgChip, statusMsg, gotoInput };
 }
 
 /**
@@ -152,10 +173,22 @@ export function buildSideToolbar(doc, toolbar, ctx) {
   const { editor, actions } = ctx;
   toolbar.textContent = "";
 
+  // Colour groups keep a compact labelled row each; the selected colour is
+  // mirrored onto the group label by renderUI.
   const fgWrap = doc.createElement("div");
   fgWrap.className = "tt-swatches tt-swatches--fg";
+  const fgLabel = doc.createElement("span");
+  fgLabel.className = "tt-swatches-label";
+  fgLabel.setAttribute("data-i18n", "text-colour");
+  fgLabel.textContent = STRINGS[ctx.lang]["text-colour"];
+  fgWrap.appendChild(fgLabel);
   const bgWrap = doc.createElement("div");
   bgWrap.className = "tt-swatches tt-swatches--bg";
+  const bgLabel = doc.createElement("span");
+  bgLabel.className = "tt-swatches-label";
+  bgLabel.setAttribute("data-i18n", "bg-colour");
+  bgLabel.textContent = STRINGS[ctx.lang]["bg-colour"];
+  bgWrap.appendChild(bgLabel);
   PALETTE.forEach((css, c) => {
     for (const [wrap, set] of [[fgWrap, "fg"], [bgWrap, "bg"]]) {
       const sw = doc.createElement("button");
@@ -167,6 +200,20 @@ export function buildSideToolbar(doc, toolbar, ctx) {
       wrap.appendChild(sw);
     }
   });
+
+  // The full character palette is collapsed by default on narrow screens so
+  // the canvas and essential controls share the first viewport; it is also
+  // height-contained with its own scroll when open.
+  const paletteDetails = doc.createElement("details");
+  paletteDetails.className = "tt-palette";
+  const narrow =
+    typeof matchMedia === "function" && matchMedia("(max-width: 767px)").matches;
+  paletteDetails.open = !narrow;
+  const summary = doc.createElement("summary");
+  summary.className = "tt-palette-summary";
+  summary.setAttribute("data-i18n", "palette");
+  summary.textContent = STRINGS[ctx.lang].palette;
+  paletteDetails.appendChild(summary);
 
   const chars = doc.createElement("div");
   chars.className = "tt-char-palette";
@@ -181,8 +228,9 @@ export function buildSideToolbar(doc, toolbar, ctx) {
     b.addEventListener("click", () => actions.enterChar(ch));
     chars.appendChild(b);
   }
+  paletteDetails.appendChild(chars);
 
-  toolbar.append(fgWrap, bgWrap, chars);
+  toolbar.append(fgWrap, bgWrap, paletteDetails);
 }
 
 /**
@@ -270,9 +318,39 @@ export function renderUI(canvas, status, ctx) {
   }
   renderToDOM(canvas, page, { flashOn: flash.flashOn, revealed: navigator.state.revealed });
   canvas.setAttribute("data-page", String(navigator.state.current));
+
+  // Orientation: mark the cursor cell so the editing position is visible.
+  if (editor.state.cursor !== null) {
+    const { row, col } = editor.state.cursor;
+    const el = canvas.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    if (el) {
+      el.classList.add("tt-cursor");
+    }
+  }
+
   if (status) {
     const strings = STRINGS[ctx.lang];
-    status.textContent = navigator.state.notFound ? strings["page-not-found"] : "";
+    const pageLabel = status.querySelector(".tt-status-page");
+    const modeLabel = status.querySelector(".tt-status-mode");
+    const msg = status.querySelector(".tt-status-msg");
+    const fgChip = status.querySelector(".tt-chip--fg");
+    const bgChip = status.querySelector(".tt-chip--bg");
+    if (pageLabel) {
+      pageLabel.textContent = `${strings.page} ${navigator.state.current}`;
+    }
+    if (modeLabel) {
+      const mode = canvas.getAttribute("data-mode") === "mosaic" ? "mode-mosaic" : "mode-text";
+      modeLabel.textContent = strings[mode];
+    }
+    if (fgChip) {
+      fgChip.style.backgroundColor = PALETTE[editor.state.fg];
+    }
+    if (bgChip) {
+      bgChip.style.backgroundColor = PALETTE[editor.state.bg];
+    }
+    if (msg) {
+      msg.textContent = navigator.state.notFound ? strings["page-not-found"] : "";
+    }
     status.setAttribute("data-not-found", navigator.state.notFound ? "true" : "false");
   }
 }

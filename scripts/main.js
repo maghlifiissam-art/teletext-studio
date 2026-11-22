@@ -144,7 +144,7 @@ async function bootstrap() {
     },
     showError(key) {
       if (statusHandle) {
-        statusHandle.status.textContent = strings()[key] ?? key;
+        (statusHandle.statusMsg ?? statusHandle.status).textContent = strings()[key] ?? key;
       }
     },
   };
@@ -157,7 +157,7 @@ async function bootstrap() {
   }
 
   statusHandle = buildTopToolbar(doc, topToolbar, { editor, lang: ctx.lang, actions });
-  buildSideToolbar(doc, sideToolbar, { editor, actions });
+  buildSideToolbar(doc, sideToolbar, { editor, actions, lang: ctx.lang });
   wireCanvas(doc, canvas, ctx);
   wireFastextBar(fastextBar, ctx);
   wireLanguageToggle(root, langToggle, ctx);

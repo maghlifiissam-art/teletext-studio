@@ -79,6 +79,10 @@ body.tt-app {
   align-content: flex-start;
   gap: 0.5rem;
   flex: 0 0 18rem; /* fixed palette column so the canvas shares the row */
+  /* Contain the column: it scrolls internally instead of stretching the
+     page past the canvas height. */
+  max-block-size: calc(100vh - 7rem);
+  overflow-y: auto;
   border-inline-end: 1px solid #333;
 }
 
@@ -104,7 +108,9 @@ body.tt-app {
   grid-template-rows: repeat(24, 1fr);
   gap: var(--tt-grid-gap);
   aspect-ratio: 40 / 24;
-  background: var(--tt-color-0);
+  /* Faint grid lines between cells give editing orientation on an
+     otherwise all-black page, without disturbing the retro look. */
+  background: #1a1a1a;
   /* Keep the canvas within the viewport and never force horizontal scroll. */
   inline-size: 100%;
   max-inline-size: min(100%, calc((100vh - 8rem) * (40 / 24)));
@@ -115,6 +121,7 @@ body.tt-app {
 
 .tt-page-canvas .tt-cell {
   background: var(--tt-color-0);
+  outline: 0 solid transparent;
   color: var(--tt-color-7);
   display: flex;
   align-items: center;
@@ -125,6 +132,58 @@ body.tt-app {
   overflow: hidden;
   /* Inline-size 0 / min-inline-size 0 lets the 40 columns share space evenly. */
   min-inline-size: 0;
+}
+
+/* Cursor: the selected cell carries a visible yellow frame (editing
+   orientation, Req. 1.2). */
+.tt-page-canvas .tt-cell.tt-cursor {
+  outline: 2px solid var(--tt-color-3);
+  outline-offset: -2px;
+}
+
+/* Status area: current page, mode, and fg/bg colour chips.            */
+.tt-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+}
+
+.tt-status .tt-chip {
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  border: 1px solid #666;
+  border-radius: 0.15rem;
+}
+
+.tt-status-msg {
+  color: var(--tt-color-3);
+}
+
+/* Swatch groups keep their label on the same wrapped row.             */
+.tt-swatches-label {
+  min-block-size: var(--tt-touch);
+  display: inline-flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+/* Character palette: collapsible; scroll-contained when open.         */
+.tt-palette-summary {
+  min-block-size: var(--tt-touch);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  border: 1px solid #444;
+  border-radius: 0.25rem;
+  padding-inline: 0.75rem;
+}
+
+.tt-palette .tt-char-palette {
+  max-block-size: 14rem;
+  overflow-y: auto;
+  padding-block-start: 0.5rem;
 }
 
 /* Flashing phase: hide flashing-cell content when the phase is off.   */
@@ -225,6 +284,17 @@ body.tt-app {
     flex-direction: column;
   }
 
+  /* Canvas first: it and the top toolbar share the initial viewport,
+     with the editing palettes below (Req. 11.4). */
+  .tt-page-canvas {
+    order: -1;
+  }
+
+  .tt-toolbar--side {
+    max-block-size: none; /* flows below the canvas, page scrolls */
+    overflow-y: visible;
+  }
+
   .tt-toolbar--side {
     flex: 1 1 auto; /* undo the desktop fixed basis */
     flex-direction: row;
@@ -309,13 +379,7 @@ body.tt-app[dir="rtl"] {
   border: 1px solid #444;
 }
 
-.tt-status {
-  color: var(--tt-color-3);
-  font-weight: bold;
-  padding-inline: 0.5rem;
-}
-
-.tt-status[data-not-found="true"] {
+.tt-status[data-not-found="true"] .tt-status-msg {
   color: var(--tt-color-1);
 }
 
