@@ -6,66 +6,66 @@ Teletext Studio is a client-side web application with no build step, written in 
 
 ## Tasks
 
-- [ ] 1. Set up project structure and static-file scaffolding
-  - [ ] 1.1 Create directory structure and `index.html`
+- [x] 1. Set up project structure and static-file scaffolding
+  - [x] 1.1 Create directory structure and `index.html`
     - Create `scripts/`, `styles/`, `assets/`, and `tests/` directories
     - Create `index.html` linking `styles/main.css` and loading `scripts/main.js` as an ES module (`<script type="module">`)
     - Define the page canvas container, toolbar containers, and Fastext link bar placeholders
     - _Requirements: 10.1, 10.2_
-  - [ ] 1.2 Create `styles/main.css` with base grid, control, responsive, RTL, and touch-target styles
+  - [x] 1.2 Create `styles/main.css` with base grid, control, responsive, RTL, and touch-target styles
     - Style the 40×24 cell grid using CSS grid; define the 8-colour teletext palette CSS variables
     - Add responsive rules below 768px viewport width to prevent horizontal scrolling
     - Set minimum 44×44 CSS px touch targets for non-canvas interactive controls
     - Include RTL layout rules via CSS logical properties for the Arabic toggle
     - _Requirements: 11.2, 11.4_
-  - [ ] 1.3 Create `assets/charset.json` — the 256-entry Teletext Charset table
+  - [x] 1.3 Create `assets/charset.json` — the 256-entry Teletext Charset table
     - Map codes 0x20–0x7E to printable ASCII glyphs (0x20 = space as the default/blank glyph)
     - Map codes 0x80–0xFF to the Arabic national-option subset (basic letters and presentation forms)
     - Provide both `codeToUnicode` and `unicodeToCode` lookup directions in the JSON structure
     - _Requirements: 12.3_
-  - [ ] 1.4 Set up test tooling — `package.json` with vitest and fast-check, vitest config
+  - [x] 1.4 Set up test tooling — `package.json` with vitest and fast-check, vitest config
     - Add `package.json` with `vitest` and `fast-check` as devDependencies
     - Configure vitest for single-execution mode (`--run`); no watch mode in automated runs
     - Create `tests/properties/` and `tests/integration/` directories for test files
     - _Requirements: 10.2_
 
-- [ ] 2. Implement the pure data model in `scripts/model.js`
-  - [ ] 2.1 Implement Palette, Charset interface, Cell, Page, and Page_Set
+- [x] 2. Implement the pure data model in `scripts/model.js`
+  - [x] 2.1 Implement Palette, Charset interface, Cell, Page, and Page_Set
     - Define `PALETTE` (8 colours in fixed order: black, red, green, yellow, blue, magenta, cyan, white), `FG_DEFAULT = 7`, `BG_DEFAULT = 0`
     - Implement `Charset` with `codeToUnicode(code)` and `unicodeToCode(ch)` (returns -1 for out-of-repertoire, mapped to space fallback)
     - Implement `defaultCell()` (space, fg=white, bg=black, text mode, mosaic=0, no flags), `switchMode(cell, mode)` (preserves fg/bg, inits mosaic=0), `toggleSextant(cell, bit)` (XOR bit 0..5)
     - Implement `Page` with `COLS=40`, `ROWS=24`, `MIN_PAGE=100`, `MAX_PAGE=899`, `newPage(number)` (960 default cells, all fastext null), `validPageNumber(n)`
     - Implement `Page_Set` with `newPageSet()`, `getPage()`, `addPage()`, `deletePage()`, `renamePage()` (preserves content), `nextAvailableNumber()` (smallest unused 100..899 or null)
     - _Requirements: 2.1, 2.2, 3.1, 3.2, 3.4, 3.6, 6.1_
-  - [ ]* 2.2 Write property test for palette invariant
+  - [x]* 2.2 Write property test for palette invariant
     - **Property 3: Palette invariant** — the palette has exactly eight colours in the fixed order black, red, green, yellow, blue, magenta, cyan, white with the specified hex values
     - **Validates: Requirements 2.1**
-  - [ ]* 2.3 Write property test for charset round trip
+  - [x]* 2.3 Write property test for charset round trip
     - **Property 34: Charset round trip** — for every supported character (including Arabic subset), `codeToUnicode(unicodeToCode(ch)) == ch`; out-of-repertoire input maps to space
     - **Validates: Requirements 12.3**
-  - [ ]* 2.4 Write property test for sextant toggle being its own inverse
+  - [x]* 2.4 Write property test for sextant toggle being its own inverse
     - **Property 13: Sextant toggle is its own inverse** — `toggleSextant(toggleSextant(cell, b), b)` equals the original cell; a single toggle flips exactly that bit
     - **Validates: Requirements 3.2**
-  - [ ]* 2.5 Write property test for mode switch preserving colours and initialising mosaic
+  - [x]* 2.5 Write property test for mode switch preserving colours and initialising mosaic
     - **Property 14: Mode switch preserves colours and initialises mosaic** — switching between text and mosaic preserves fg/bg, and entering mosaic mode sets pattern to 0
     - **Validates: Requirements 3.4, 3.6**
-  - [ ]* 2.6 Write property test for grid dimension invariant
+  - [x]* 2.6 Write property test for grid dimension invariant
     - **Property 1: Grid dimension invariant** — for any Page, the cells array has exactly 24 rows and each row has exactly 40 columns
     - **Validates: Requirements 1.1, 1.5**
-  - [ ]* 2.7 Write property test for default cell invariant
+  - [x]* 2.7 Write property test for default cell invariant
     - **Property 2: Default cell invariant** — every cell of a new Page equals the default cell (space, fg=white, bg=black, text, mosaic=0, no flags)
     - **Validates: Requirements 2.2**
-  - [ ]* 2.8 Write property test for page-number range invariant
+  - [x]* 2.8 Write property test for page-number range invariant
     - **Property 18: Page-number range invariant** — every key in a PageSet's pages map is an integer in 100..899
     - **Validates: Requirements 6.1**
-  - [ ]* 2.9 Write property test for delete removing the page
+  - [x]* 2.9 Write property test for delete removing the page
     - **Property 21: Delete removes the page** — after `deletePage(n)`, the page is absent and the count decreases by exactly one
     - **Validates: Requirements 6.4**
-  - [ ]* 2.10 Write property test for rename preserving page content
+  - [x]* 2.10 Write property test for rename preserving page content
     - **Property 22: Rename preserves page content** — after a valid rename, the page under the new number is content-identical (all cells, colours, flags, and Fastext targets preserved)
     - **Validates: Requirements 6.5**
 
-- [ ] 3. Checkpoint - Ensure all tests pass
+- [x] 3. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Implement the Renderer in `scripts/renderer.js`
@@ -275,15 +275,18 @@ Teletext Studio is a client-side web application with no build step, written in 
     { "id": 1, "tasks": ["2.1"] },
     { "id": 2, "tasks": ["2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8", "2.9", "2.10"] },
     { "id": 3, "tasks": ["3"] },
-    { "id": 4, "tasks": ["4.1", "6.1", "8.1", "10.1"] },
-    { "id": 5, "tasks": ["4.2", "4.3", "4.4", "4.5", "5.1", "9.1", "6.2", "6.3", "6.4", "6.5", "6.6", "6.7", "6.8", "6.9", "6.10", "6.11", "6.12", "6.13", "6.14", "8.2", "8.3", "8.4", "10.2", "10.3", "10.4", "10.5", "10.6"] },
-    { "id": 6, "tasks": ["5.2", "9.3"] },
+    { "id": 4, "tasks": ["4.1", "6.1"] },
+    { "id": 5, "tasks": ["4.2", "4.3", "4.4", "4.5", "5.1", "6.2", "6.3", "6.4", "6.5", "6.6", "6.7", "6.8", "6.9", "6.10", "6.11", "6.12", "6.13", "6.14"] },
+    { "id": 6, "tasks": ["5.2"] },
     { "id": 7, "tasks": ["7"] },
-    { "id": 8, "tasks": ["12.1"] },
-    { "id": 9, "tasks": ["12.2", "12.3", "12.4", "13.1", "14.1"] },
-    { "id": 10, "tasks": ["15.1"] },
-    { "id": 11, "tasks": ["15.2"] },
-    { "id": 12, "tasks": ["16"] }
+    { "id": 8, "tasks": ["8.1", "9.1", "10.1"] },
+    { "id": 9, "tasks": ["8.2", "8.3", "8.4", "9.2", "9.3", "10.2", "10.3", "10.4", "10.5", "10.6"] },
+    { "id": 10, "tasks": ["11"] },
+    { "id": 11, "tasks": ["12.1"] },
+    { "id": 12, "tasks": ["12.2", "12.3", "12.4", "13.1", "14.1"] },
+    { "id": 13, "tasks": ["15.1"] },
+    { "id": 14, "tasks": ["15.2"] },
+    { "id": 15, "tasks": ["16"] }
   ]
 }
 ```

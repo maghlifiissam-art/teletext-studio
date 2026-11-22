@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      name="description"
+      content="Teletext Studio — a client-side, no-build tool for designing 40x24 teletext pages with mosaic graphics, flashing, conceal, Fastext navigation, PNG export, and shareable URLs."
+    />
+    <title>Teletext Studio</title>
+    <link rel="stylesheet" href="styles/main.css" />
+  </head>
+  <body class="tt-app" data-lang="en" data-dir="ltr">
+    <!-- Top toolbar: page management, mode, colour, and attribute controls. -->
+    <header class="tt-toolbar tt-toolbar--top" id="toolbar-top" aria-label="Editor toolbar"></header>
+
+    <main class="tt-main" id="app-main">
+      <!-- Side toolbar: colour swatches, character palette, sextant grid (soft input). -->
+      <aside class="tt-toolbar tt-toolbar--side" id="toolbar-side" aria-label="Editing palette"></aside>
+
+      <!-- Page canvas: the 40x24 cell grid is rendered into this container. -->
+      <section
+        class="tt-page-canvas"
+        id="page-canvas"
+        aria-label="Teletext page canvas"
+        role="grid"
+        aria-rowcount="24"
+        aria-colcount="40"
+      >
+        <!-- The 960 cell elements are created here by scripts/renderer.js. -->
+      </section>
+    </main>
+
+    <!-- Fastext link bar: four coloured navigation links (red, green, yellow, cyan). -->
+    <nav class="tt-fastext-bar" id="fastext-bar" aria-label="Fastext navigation links">
+      <button type="button" class="tt-fastext-link" data-fastext-key="red"    data-color="1" aria-label="Fastext red link">Red</button>
+      <button type="button" class="tt-fastext-link" data-fastext-key="green"  data-color="2" aria-label="Fastext green link">Green</button>
+      <button type="button" class="tt-fastext-link" data-fastext-key="yellow" data-color="3" aria-label="Fastext yellow link">Yellow</button>
+      <button type="button" class="tt-fastext-link" data-fastext-key="cyan"   data-color="6" aria-label="Fastext cyan link">Cyan</button>
+    </nav>
+
+    <!-- Language / direction toggle control (English/LTR default, Arabic/RTL on toggle). -->
+    <button type="button" class="tt-lang-toggle" id="lang-toggle" aria-pressed="false" aria-label="Toggle Arabic / right-to-left UI">
+      العربية
+    </button>
+
+    <!-- Application bootstrap. Plain ES module, no build step. -->
+    <script type="module" src="scripts/main.js"></script>
+  </body>
+</html>

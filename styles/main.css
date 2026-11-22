@@ -1,0 +1,279 @@
+/*
+ * Teletext Studio — main stylesheet.
+ * Base grid, control, responsive, RTL, and touch-target styles.
+ * No build step: this file is linked directly from index.html.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Teletext palette as CSS custom properties (index = stored colour). */
+/* ------------------------------------------------------------------ */
+:root {
+  --tt-color-0: #000000; /* 0 black    */
+  --tt-color-1: #ff0000; /* 1 red      */
+  --tt-color-2: #00ff00; /* 2 green    */
+  --tt-color-3: #ffff00; /* 3 yellow   */
+  --tt-color-4: #0000ff; /* 4 blue     */
+  --tt-color-5: #ff00ff; /* 5 magenta  */
+  --tt-color-6: #00ffff; /* 6 cyan     */
+  --tt-color-7: #ffffff; /* 7 white    */
+
+  /* Minimum touch target for non-canvas interactive controls (Req. 11.2). */
+  --tt-touch: 44px;
+
+  /* Viewport breakpoint for the responsive reflow (Req. 11.4). */
+  --tt-breakpoint: 768px;
+
+  --tt-grid-gap: 1px;
+  --tt-app-bg: #000000;
+  --tt-chrome-bg: #111111;
+  --tt-chrome-fg: #ffffff;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reset / base.                                                        */
+/* ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body.tt-app {
+  background: var(--tt-app-bg);
+  color: var(--tt-chrome-fg);
+  font-family: "Courier New", Consolas, monospace;
+  display: flex;
+  flex-direction: column;
+  /* Prevent horizontal scrolling at any size (Req. 11.4). */
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ------------------------------------------------------------------ */
+/* Toolbars. Use CSS logical properties so RTL flips automatically.    */
+/* ------------------------------------------------------------------ */
+.tt-toolbar {
+  background: var(--tt-chrome-bg);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
+}
+
+.tt-toolbar--top {
+  border-block-end: 1px solid #333;
+}
+
+.tt-toolbar--side {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  inline-size: auto;
+  border-inline-end: 1px solid #333;
+}
+
+/* ------------------------------------------------------------------ */
+/* Main layout: side toolbar + page canvas.                            */
+/* ------------------------------------------------------------------ */
+.tt-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+  min-width: 0; /* allow children to shrink within the flex container */
+}
+
+/* ------------------------------------------------------------------ */
+/* Page canvas: a 40-column x 24-row CSS grid of cells (Req. 1.1).     */
+/* The aspect ratio fixes the authentic 40:24 grid; the grid fills it. */
+/* ------------------------------------------------------------------ */
+.tt-page-canvas {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(40, 1fr);
+  grid-template-rows: repeat(24, 1fr);
+  gap: var(--tt-grid-gap);
+  aspect-ratio: 40 / 24;
+  background: var(--tt-color-0);
+  /* Keep the canvas within the viewport and never force horizontal scroll. */
+  inline-size: 100%;
+  max-inline-size: min(100%, calc((100vh - 8rem) * (40 / 24)));
+  margin-inline: auto;
+  padding: var(--tt-grid-gap);
+  min-block-size: 0;
+}
+
+.tt-page-canvas .tt-cell {
+  background: var(--tt-color-0);
+  color: var(--tt-color-7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(0.5rem, 2.2vw, 1.4rem);
+  line-height: 1;
+  user-select: none;
+  overflow: hidden;
+  /* Inline-size 0 / min-inline-size 0 lets the 40 columns share space evenly. */
+  min-inline-size: 0;
+}
+
+/* Flashing phase: hide flashing-cell content when the phase is off.   */
+.tt-page-canvas[data-flash-phase="off"] .tt-cell[data-flashing="true"] {
+  color: transparent;
+}
+
+/* Concealed cells: hidden until the reveal attribute is set.         */
+.tt-page-canvas[data-revealed="false"] .tt-cell[data-concealed="true"] {
+  color: transparent;
+}
+
+/* ------------------------------------------------------------------ */
+/* Fastext link bar: four coloured keys in fixed order.                */
+/* ------------------------------------------------------------------ */
+.tt-fastext-bar {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  padding-block: 0.5rem;
+  padding-inline: 0.75rem;
+  background: var(--tt-chrome-bg);
+  border-block-start: 1px solid #333;
+}
+
+.tt-fastext-link {
+  flex: 1 1 0;
+  min-block-size: var(--tt-touch);
+  min-inline-size: var(--tt-touch);
+  border: none;
+  border-radius: 0.25rem;
+  color: #000;
+  font-weight: bold;
+  font-family: inherit;
+  cursor: pointer;
+  /* Colour keys use the teletext palette by data-color index. */
+  background: var(--tt-color-1);
+}
+
+.tt-fastext-link[data-fastext-key="red"]    { background: var(--tt-color-1); }
+.tt-fastext-link[data-fastext-key="green"]  { background: var(--tt-color-2); }
+.tt-fastext-link[data-fastext-key="yellow"] { background: var(--tt-color-3); }
+.tt-fastext-link[data-fastext-key="cyan"]   { background: var(--tt-color-6); }
+
+/* ------------------------------------------------------------------ */
+/* Language / direction toggle (top-end corner).                      */
+/* ------------------------------------------------------------------ */
+.tt-lang-toggle {
+  position: fixed;
+  inset-block-start: 0.5rem;
+  inset-inline-end: 0.5rem;
+  z-index: 10;
+  min-block-size: var(--tt-touch);
+  min-inline-size: var(--tt-touch);
+  padding-inline: 0.75rem;
+  border-radius: 0.25rem;
+  border: 1px solid #444;
+  background: var(--tt-chrome-bg);
+  color: var(--tt-chrome-fg);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ------------------------------------------------------------------ */
+/* Touch targets: every non-canvas interactive control is >= 44x44.    */
+/* ------------------------------------------------------------------ */
+.tt-toolbar button,
+.tt-toolbar select,
+.tt-toolbar input[type="text"],
+.tt-toolbar input[type="number"],
+.tt-toolbar [role="button"],
+.tt-lang-toggle,
+.tt-fastext-link {
+  min-block-size: var(--tt-touch);
+  min-inline-size: var(--tt-touch);
+  border-radius: 0.25rem;
+  font: inherit;
+}
+
+/* Colour swatch / soft-input controls inherit the touch-target rule.  */
+.tt-toolbar .tt-swatch {
+  min-block-size: var(--tt-touch);
+  min-inline-size: var(--tt-touch);
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive reflow below the 768px breakpoint (Req. 11.4): no         */
+/* horizontal scrolling, stacked toolbars, canvas scaled to fit.       */
+/* ------------------------------------------------------------------ */
+@media (max-width: 767px) {
+  body.tt-app {
+    overflow-x: hidden;
+  }
+
+  .tt-main {
+    flex-direction: column;
+  }
+
+  .tt-toolbar--side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    inline-size: 100%;
+    border-inline-end: none;
+    border-block-end: 1px solid #333;
+  }
+
+  .tt-page-canvas {
+    max-inline-size: 100%;
+    /* Scale the 40:24 canvas to the viewport width without overflow. */
+    inline-size: min(100%, calc((100vw - 2rem) * (40 / 24)) * 0);
+    inline-size: 100%;
+    aspect-ratio: 40 / 24;
+  }
+
+  .tt-fastext-bar {
+    flex-wrap: wrap;
+  }
+
+  .tt-fastext-link {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* RTL / Arabic layout via the document direction attribute.          */
+/* CSS logical properties above already mirror spacing; these rules    */
+/* flip the visual order of the Fastext keys and the toolbar flow.     */
+/* ------------------------------------------------------------------ */
+html[dir="rtl"] body.tt-app {
+  direction: rtl;
+}
+
+html[dir="rtl"] .tt-toolbar {
+  /* Logical properties keep padding/gap correct in RTL; flip the flex order. */
+  flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .tt-toolbar--side {
+  flex-direction: column;
+  border-inline-end: none;
+  border-inline-start: 1px solid #333;
+}
+
+html[dir="rtl"] .tt-fastext-bar {
+  flex-direction: row-reverse;
+}
+
+/* Arabic text within a cell renders right-to-left.                    */
+html[dir="rtl"] .tt-page-canvas .tt-cell {
+  direction: rtl;
+  unicode-bidi: plaintext;
+}

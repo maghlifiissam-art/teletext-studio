@@ -1,0 +1,15 @@
+{
+  "name": "teletext-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Client-side, no-build tool for designing 40x24 teletext pages with mosaic graphics, flashing, conceal, Fastext navigation, PNG export, and shareable URLs.",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "fast-check": "^3.19.0",
+    "vitest": "^2.1.0"
+  }
+}
