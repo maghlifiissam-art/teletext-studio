@@ -209,25 +209,25 @@ Teletext Studio is a client-side web application with no build step, written in 
 - [x] 11. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Implement UI wiring, language/RTL toggle, and mobile/touch soft input in `scripts/ui.js`
-  - [ ] 12.1 Implement UI controls, language/RTL toggle, and on-screen soft input
+- [x] 12. Implement UI wiring, language/RTL toggle, and mobile/touch soft input in `scripts/ui.js`
+  - [x] 12.1 Implement UI controls, language/RTL toggle, and on-screen soft input
     - Wire toolbar controls to Editor methods (cell selection, character entry, deletion, colour selection, mode toggle, flashing/conceal toggles, page create/delete/rename, Fastext assignment)
     - Wire the page canvas to Renderer and FlashController; wire Fastext link bar to Navigator
     - Implement the language/direction toggle: set `<html dir>` and `lang`, flip UI layout via CSS logical properties, switch labels (English/LTR default, Arabic/RTL on toggle); toggling changes only UI presentation, never mutates Page content
     - Implement on-screen soft input (character palette, colour swatches, sextant grid) so users without a physical keyboard can select cells, enter characters, toggle sextants, and set colours via touch
     - _Requirements: 1.1, 2.3, 2.4, 3.5, 4.3, 4.4, 5.5, 7.1, 7.4, 11.1, 11.5, 12.1, 12.2, 12.4, 12.5_
-  - [ ]* 12.2 Write property test for language/direction toggle preserving the model
+  - [x]* 12.2 Write property test for language/direction toggle preserving the model
     - **Property 35: Language/direction toggle preserves the model** — toggling UI language and text direction leaves the PageSet byte-identical
     - **Validates: Requirements 12.4**
-  - [ ]* 12.3 Write unit test for language/RTL toggle UI state transitions and Arabic RTL rendering
+  - [x]* 12.3 Write unit test for language/RTL toggle UI state transitions and Arabic RTL rendering
     - Verify the UI defaults to English/LTR, the toggle control is present, switching applies Arabic labels and RTL layout, and Arabic text renders RTL within cells
     - _Requirements: 12.1, 12.2, 12.3, 12.5_
-  - [ ]* 12.4 Write unit test for touch selection and touch Fastext activation wiring
+  - [x]* 12.4 Write unit test for touch selection and touch Fastext activation wiring
     - Verify tapping a cell selects it via touch input, and tapping a Fastext link navigates to the target page via touch input
     - _Requirements: 11.1, 11.3_
 
-- [ ] 13. Implement bootstrap and URL hash loading in `scripts/main.js`
-  - [ ] 13.1 Implement application bootstrap and startup URL hash loading
+- [x] 13. Implement bootstrap and URL hash loading in `scripts/main.js`
+  - [x] 13.1 Implement application bootstrap and startup URL hash loading
     - On load, read `location.hash`; if a valid `#t=` payload is present, call `URL_Decoder.decode` to rebuild the PageSet; otherwise create an empty PageSet with a single default page (100)
     - Initialise the Editor, Renderer, FlashController, Navigator, and UI; start the FlashController
     - Wire the Exporter and URL_Encoder to their UI triggers (PNG export button, share-URL button)

@@ -1,12 +1,272 @@
 /*
- * scripts/ui.js — UI wiring, language/RTL toggle, soft input (placeholder).
+ * scripts/ui.js — UI wiring, language/RTL toggle, soft input.
  *
- * Implemented in a later task. Wires toolbar controls to Editor/Navigator
- * methods, the page canvas to the Renderer/FlashController, the Fastext bar
- * to the Navigator, the language/direction toggle, and the on-screen soft
- * input (character palette, colour swatches, sextant grid).
+ * Wires the toolbar controls to the Editor, the page canvas to the Renderer
+ * and FlashController, the Fastext bar to the Navigator, and the
+ * English/Arabic language-direction toggle (Req. 11, 12). The toggle only
+ * ever changes presentation attributes and label text; the PageSet model is
+ * untouched (Req. 12.4).
  *
- * This file is intentionally a stub.
+ * Every function takes its DOM objects as arguments so the wiring is
+ * testable under jsdom without a browser.
  */
 
-export {};
+import { COLS, ROWS, PALETTE, CHARSET } from "./model.js";
+import { renderToDOM } from "./renderer.js";
+
+/** UI strings in both supported languages (Req. 12.1 / 12.2). */
+export const STRINGS = {
+  en: {
+    "lang-toggle": "العربية",
+    "mode-text": "Text",
+    "mode-mosaic": "Mosaic",
+    flash: "Flash",
+    conceal: "Conceal",
+    reveal: "Reveal",
+    "export-png": "Export PNG",
+    "share-url": "Copy share URL",
+    "new-page": "New page",
+    "delete-page": "Delete page",
+    "go-to": "Go to",
+    "page-not-found": "Page not found",
+    "export-failed": "Export failed",
+    "too-large": "Too large to share",
+  },
+  ar: {
+    "lang-toggle": "English",
+    "mode-text": "نص",
+    "mode-mosaic": "فسيفساء",
+    flash: "وميض",
+    conceal: "إخفاء",
+    reveal: "إظهار",
+    "export-png": "تصدير PNG",
+    "share-url": "نسخ رابط المشاركة",
+    "new-page": "صفحة جديدة",
+    "delete-page": "حذف الصفحة",
+    "go-to": "انتقل إلى",
+    "page-not-found": "الصفحة غير موجودة",
+    "export-failed": "فشل التصدير",
+    "too-large": "كبير جداً للمشاركة",
+  },
+};
+
+export const DEFAULT_LANG = "en";
+
+/**
+ * Apply a language/direction to the UI (Req. 12.1 / 12.2 / 12.5).
+ *
+ * Sets lang/dir attributes on the root element, swaps the text of every
+ * [data-i18n] element, and marks the toggle aria-pressed. Pure presentation:
+ * it receives no model object and cannot mutate one (Req. 12.4).
+ *
+ * @param {object} root the root element carrying lang/dir (e.g. document.body)
+ * @param {string} lang "en" | "ar"
+ */
+export function applyLanguage(root, lang) {
+  if (!STRINGS[lang]) {
+    throw new Error("unsupported language");
+  }
+  const dir = lang === "ar" ? "rtl" : "ltr";
+  root.setAttribute("lang", lang);
+  root.setAttribute("dir", dir);
+  root.setAttribute("data-lang", lang);
+  root.setAttribute("data-dir", dir);
+  const strings = STRINGS[lang];
+  for (const el of root.querySelectorAll("[data-i18n]")) {
+    const key = el.getAttribute("data-i18n");
+    if (strings[key] !== undefined) {
+      el.textContent = strings[key];
+    }
+  }
+  const toggle = root.querySelector("#lang-toggle");
+  if (toggle) {
+    toggle.setAttribute("aria-pressed", lang === "ar" ? "true" : "false");
+  }
+}
+
+/** The other language (toggle transition). */
+export function nextLanguage(lang) {
+  return lang === "ar" ? "en" : "ar";
+}
+
+/* A small soft-input character palette: printable ASCII favourites plus a
+   sample of the Arabic national-option subset (Req. 11.5 / 12.3). */
+const PALETTE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,!?-:/()#%".split("");
+const ARABIC_CHARS = ["ا", "ب", "ت", "ث", "ج", "ح", "خ", "د", "ذ", "ر", "ز", "س", "ش", "ص", "ض", "ط", "ظ", "ع", "غ", "ف", "ق", "ك", "ل", "م", "ن", "ه", "و", "ي", "ة", "ى", "ء", "أ", "إ", "ؤ", "ئ", "٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+
+function button(doc, key, lang, onClick, extraClass) {
+  const b = doc.createElement("button");
+  b.type = "button";
+  b.className = "tt-btn" + (extraClass ? " " + extraClass : "");
+  b.setAttribute("data-i18n", key);
+  b.textContent = STRINGS[lang][key] ?? key;
+  b.addEventListener("click", onClick);
+  return b;
+}
+
+/**
+ * Build the top toolbar: mode, attributes, page controls, export, share.
+ * @returns {object} handles used for status display
+ */
+export function buildTopToolbar(doc, toolbar, ctx) {
+  const { editor, lang, actions } = ctx;
+  toolbar.textContent = "";
+
+  const modeText = button(doc, "mode-text", lang, () => actions.setMode("text"));
+  const modeMosaic = button(doc, "mode-mosaic", lang, () => actions.setMode("mosaic"));
+  const flash = button(doc, "flash", lang, () => actions.setFlashing(true));
+  const conceal = button(doc, "conceal", lang, () => actions.setConcealed(true));
+  const reveal = button(doc, "reveal", lang, () => actions.toggleReveal());
+  const exportPng = button(doc, "export-png", lang, () => actions.exportPng());
+  const share = button(doc, "share-url", lang, () => actions.shareUrl());
+  const newPage = button(doc, "new-page", lang, () => actions.newPage());
+  const deletePage = button(doc, "delete-page", lang, () => actions.deletePage());
+
+  const gotoWrap = doc.createElement("span");
+  gotoWrap.className = "tt-goto";
+  const gotoInput = doc.createElement("input");
+  gotoInput.className = "tt-goto-input";
+  gotoInput.type = "number";
+  gotoInput.min = "100";
+  gotoInput.max = "899";
+  gotoInput.value = String(editor.state.activePage);
+  const gotoBtn = button(doc, "go-to", lang, () => actions.goTo(Number(gotoInput.value)));
+  gotoWrap.append(gotoInput, gotoBtn);
+
+  const status = doc.createElement("span");
+  status.className = "tt-status";
+  status.setAttribute("role", "status");
+
+  toolbar.append(
+    modeText, modeMosaic, flash, conceal, reveal,
+    exportPng, share, newPage, deletePage, gotoWrap, status
+  );
+  return { status, gotoInput };
+}
+
+/**
+ * Build the side toolbar: colour swatches and the soft character palette
+ * (Req. 11.5). Every control is a >= 44px touch target (styles/main.css).
+ */
+export function buildSideToolbar(doc, toolbar, ctx) {
+  const { editor, actions } = ctx;
+  toolbar.textContent = "";
+
+  const fgWrap = doc.createElement("div");
+  fgWrap.className = "tt-swatches tt-swatches--fg";
+  const bgWrap = doc.createElement("div");
+  bgWrap.className = "tt-swatches tt-swatches--bg";
+  PALETTE.forEach((css, c) => {
+    for (const [wrap, set] of [[fgWrap, "fg"], [bgWrap, "bg"]]) {
+      const sw = doc.createElement("button");
+      sw.type = "button";
+      sw.className = "tt-swatch";
+      sw.style.backgroundColor = css;
+      sw.setAttribute("aria-label", `${set} colour ${c}`);
+      sw.addEventListener("click", () => actions.setColour(set, c));
+      wrap.appendChild(sw);
+    }
+  });
+
+  const chars = doc.createElement("div");
+  chars.className = "tt-char-palette";
+  for (const ch of [...PALETTE_CHARS, ...ARABIC_CHARS]) {
+    if (CHARSET.unicodeToCode(ch) === -1) {
+      continue; // outside the teletext charset: never offered
+    }
+    const b = doc.createElement("button");
+    b.type = "button";
+    b.className = "tt-char";
+    b.textContent = ch;
+    b.addEventListener("click", () => actions.enterChar(ch));
+    chars.appendChild(b);
+  }
+
+  toolbar.append(fgWrap, bgWrap, chars);
+}
+
+/**
+ * Wire the page canvas: pointer/touch selection (Req. 11.1), mosaic sextant
+ * toggles by touch point (Req. 11.5 / 3.5), and keyboard entry.
+ */
+export function wireCanvas(doc, canvas, ctx) {
+  const { editor, mosaic, actions } = ctx;
+
+  canvas.addEventListener("pointerdown", (event) => {
+    const cellEl = event.target.closest("[data-row]");
+    if (!cellEl) {
+      return;
+    }
+    const row = Number(cellEl.dataset.row);
+    const col = Number(cellEl.dataset.col);
+    editor.selectCell(row, col); // Req. 11.1: tap selects the cell
+    if (editor.state.mode === "mosaic" || canvas.getAttribute("data-mode") === "mosaic") {
+      const rect = cellEl.getBoundingClientRect();
+      const bit = mosaic.sextantFromPoint(rect, event.clientX, event.clientY);
+      mosaic.toggleSextantAt(row, col, bit);
+    }
+    actions.render();
+  });
+
+  doc.addEventListener("keydown", (event) => {
+    if (event.target && /^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName)) {
+      return;
+    }
+    if (event.key === "Backspace" || event.key === "Delete") {
+      editor.deleteCell();
+      actions.render();
+    } else if (event.key.length === 1) {
+      editor.enterChar(event.key); // Arabic input maps through CHARSET (Req. 12.3)
+      actions.render();
+    }
+  });
+}
+
+/**
+ * Wire the Fastext bar: tap a coloured link to follow it (Req. 11.3 / 7.3).
+ * A rejected target shows the page-not-found indicator (Req. 7.5 / 7.6).
+ */
+export function wireFastextBar(bar, ctx) {
+  const { navigator, editor, actions } = ctx;
+  for (const link of bar.querySelectorAll("[data-fastext-key]")) {
+    link.addEventListener("click", () => {
+      const key = link.getAttribute("data-fastext-key");
+      const page = editor.state.current.pages.get(navigator.state.current);
+      if (page) {
+        navigator.activateFastext(page, key);
+        actions.render();
+      }
+    });
+  }
+}
+
+/**
+ * Wire the language toggle button (Req. 12.5). Switching language never
+ * touches the model; it only re-applies presentation state (Req. 12.4).
+ */
+export function wireLanguageToggle(root, toggle, ctx) {
+  toggle.addEventListener("click", () => {
+    ctx.lang = nextLanguage(ctx.lang);
+    applyLanguage(root, ctx.lang);
+    ctx.actions.render();
+  });
+}
+
+/**
+ * Re-render the active page into the canvas and mirror navigation/status
+ * state into presentation attributes.
+ */
+export function renderUI(canvas, status, ctx) {
+  const { editor, navigator, flash } = ctx;
+  const page = editor.state.current.pages.get(navigator.state.current);
+  if (!page) {
+    return;
+  }
+  renderToDOM(canvas, page, { flashOn: flash.flashOn, revealed: navigator.state.revealed });
+  canvas.setAttribute("data-page", String(navigator.state.current));
+  if (status) {
+    const strings = STRINGS[ctx.lang];
+    status.textContent = navigator.state.notFound ? strings["page-not-found"] : "";
+    status.setAttribute("data-not-found", navigator.state.notFound ? "true" : "false");
+  }
+}
