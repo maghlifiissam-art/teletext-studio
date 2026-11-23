@@ -16,7 +16,7 @@ Deployed with GitHub Pages. See the link in the repository sidebar
 ## Features
 
 - Authentic 40x24 teletext grid with the classic teletext character set,
-  rendered on a canvas with per-cell colours, double-height rows, flash and
+  rendered as a DOM/CSS grid with per-cell colours, double-height rows, flash and
   conceal/reveal
 - Mosaic graphics mode with 2x3 sextant blocks and a dedicated 0-9/A-Z
   mosaic input keyboard
@@ -62,7 +62,7 @@ spec-driven workflow:
   and drives the whole implementation.
 - **Implemented with Kiro**: project scaffolding and the pure data model
   (`scripts/model.js`) with its 11 property-based tests (Kiro tasks 1-3),
-  plus the start of the canvas renderer (`scripts/renderer.js`), begun in
+  plus the start of the page renderer (`scripts/renderer.js`), begun in
   the same Kiro session (task 4) before the quota ran out.
 - **Manual completion**: the Kiro free-tier monthly quota was exhausted
   mid-session during task 4. The renderer and its property tests were
