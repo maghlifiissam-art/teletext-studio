@@ -280,6 +280,11 @@ function createCellElement(cell, visual, row, col) {
     el.style.display = "grid";
     el.style.gridTemplateColumns = "1fr 1fr";
     el.style.gridTemplateRows = "1fr 1fr 1fr";
+    // The shared .tt-cell rule centers content with align-items:center (for
+    // text glyphs); as a grid container that collapses empty sextant divs to
+    // zero height, so stretch the sextants to fill their tracks.
+    el.style.alignItems = "stretch";
+    el.style.justifyItems = "stretch";
     let bit = 0;
     for (let srow = 0; srow < 3; srow++) {
       for (let scol = 0; scol < 2; scol++) {
