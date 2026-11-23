@@ -96,10 +96,19 @@ async function bootstrap() {
       actions.render();
     },
     setColour: (which, c) => {
-      if (which === "fg") {
-        editor.applyFgToSelection(c);
+      // Req. 2.5/2.6: a multi-cell region is painted exactly. Otherwise
+      // (cursor only or nothing selected) the colour applies to subsequent
+      // entries (Req. 2.3/2.4).
+      if (editor.state.selection) {
+        if (which === "fg") {
+          editor.applyFgToSelection(c);
+        } else {
+          editor.applyBgToSelection(c);
+        }
+      } else if (which === "fg") {
+        editor.setFg(c);
       } else {
-        editor.applyBgToSelection(c);
+        editor.setBg(c);
       }
       actions.render();
     },

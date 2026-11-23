@@ -220,3 +220,23 @@ describe("navigation keeps editor and navigator on the same page", () => {
     expect(editor.state.activePage).toBe(100);
   });
 });
+
+// Regression: colour picked with no region selection must apply to
+// subsequently typed characters (deployed-path wiring bug found 2026-11-23:
+// the toolbar only ever called applyFgToSelection, never setFg/setBg).
+describe("colour selection applies to subsequent entries", () => {
+  it("setFg colours the next typed chars, selection paints the region", async () => {
+    const { newPageSet, newPage, addPage, getPage } = await import("../../scripts/model.js");
+    const { createEditor } = await import("../../scripts/editor.js");
+    const ps = newPageSet();
+    addPage(ps, newPage(100));
+    const editor = createEditor(ps, 100);
+    editor.setFg(1); // red
+    editor.state.cursor = { row: 0, col: 0 };
+    editor.enterChar("R");
+    expect(getPage(ps, 100).cells[0][0].fg).toBe(1);
+    editor.setFg(3); // yellow
+    editor.enterChar("Y");
+    expect(getPage(ps, 100).cells[0][1].fg).toBe(3);
+  });
+});
