@@ -408,3 +408,16 @@ body.tt-app[dir="rtl"] {
   font: inherit;
   cursor: pointer;
 }
+
+/* Manual-copy fallback shown when the clipboard is unavailable (Req. 9.8). */
+.tt-manual-copy {
+  width: 100%;
+  max-width: 40rem;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.5rem;
+  color: #fff;
+  background: #111;
+  border: 1px solid #ff0;
+  border-radius: 4px;
+}

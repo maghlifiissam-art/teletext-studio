@@ -149,12 +149,40 @@ async function bootstrap() {
       }
     },
     shareUrl: async () => {
+      let url;
       try {
-        const url = await encode(editor.state.current, doc.location.href.split("#")[0]);
-        await navigator_clipboard(url);
+        url = await encode(editor.state.current, doc.location.href.split("#")[0]);
       } catch {
-        actions.showError("too-large"); // Req. 9.8
+        actions.showError("too-large"); // Req. 9.8: the URL itself is oversized
+        return;
       }
+      try {
+        await navigator_clipboard(url);
+        actions.showError("link-copied"); // informational: the copy worked
+      } catch {
+        // Clipboard denied or unavailable: never misreport as oversized;
+        // offer the URL in a selectable field instead (Req. 9.8 honest fallback).
+        actions.showManualCopy(url);
+      }
+    },
+    showManualCopy(url) {
+      if (statusHandle) {
+        let box = doc.getElementById("tt-manual-copy");
+        if (!box) {
+          box = doc.createElement("input");
+          box.id = "tt-manual-copy";
+          box.type = "text";
+          box.readOnly = true;
+          box.className = "tt-manual-copy";
+          box.setAttribute("aria-label", "Share URL");
+          statusHandle.status.after(box);
+        }
+        box.value = url;
+        box.hidden = false;
+        box.focus();
+        box.select();
+      }
+      actions.showError("copy-failed");
     },
     showError(key) {
       if (statusHandle) {
@@ -165,9 +193,15 @@ async function bootstrap() {
   ctx.actions = actions;
 
   async function navigator_clipboard(text) {
-    if (globalThis.navigator && globalThis.navigator.clipboard) {
+    if (
+      globalThis.navigator &&
+      globalThis.navigator.clipboard &&
+      globalThis.navigator.clipboard.writeText
+    ) {
       await globalThis.navigator.clipboard.writeText(text);
+      return;
     }
+    throw new Error("clipboard unavailable");
   }
 
   statusHandle = buildTopToolbar(doc, topToolbar, { editor, lang: ctx.lang, actions });
