@@ -287,7 +287,10 @@ export function wireFastextBar(bar, ctx) {
       const key = link.getAttribute("data-fastext-key");
       const page = editor.state.current.pages.get(navigator.state.current);
       if (page) {
-        navigator.activateFastext(page, key);
+        const r = navigator.activateFastext(page, key);
+        if (r && r.ok) {
+          editor.setActivePage(r.current);
+        }
         actions.render();
       }
     });

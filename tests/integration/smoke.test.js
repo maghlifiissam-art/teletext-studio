@@ -186,3 +186,37 @@ describe("end-to-end smoke", () => {
     );
   });
 });
+
+// Regression: after New page / Go to navigation the editor must edit the
+// page the navigator displays (deployed-path desync found 2026-11-23).
+describe("navigation keeps editor and navigator on the same page", () => {
+  it("typing after New page writes to the new page", async () => {
+    const { newPageSet, newPage, addPage, getPage } = await import("../../scripts/model.js");
+    const { createEditor } = await import("../../scripts/editor.js");
+    const { createNavigator } = await import("../../scripts/navigator.js");
+    const ps = newPageSet();
+    addPage(ps, newPage(100));
+    const editor = createEditor(ps, 100);
+    const navigator = createNavigator(ps, 100);
+    const n = editor.createPage();
+    const r = navigator.goTo(n);
+    expect(r.ok).toBe(true);
+    expect(editor.setActivePage(r.current)).toBe(true);
+    editor.setCursor?.(0, 0);
+    editor.state.cursor = { row: 0, col: 0 };
+    editor.enterChar("Z");
+    expect(getPage(ps, n).cells[0][0].char).not.toBe(0x20);
+    expect(getPage(ps, 100).cells[0][0].char).toBe(0x20);
+  });
+
+  it("setActivePage rejects a missing page and clears cursor on switch", async () => {
+    const { newPageSet, newPage, addPage } = await import("../../scripts/model.js");
+    const { createEditor } = await import("../../scripts/editor.js");
+    const ps = newPageSet();
+    addPage(ps, newPage(100));
+    const editor = createEditor(ps, 100);
+    editor.state.cursor = { row: 2, col: 2 };
+    expect(editor.setActivePage(555)).toBe(false);
+    expect(editor.state.activePage).toBe(100);
+  });
+});

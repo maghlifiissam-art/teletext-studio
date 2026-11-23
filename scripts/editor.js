@@ -216,6 +216,22 @@ export function createEditor(pageSet, activePage) {
       return n;
     },
 
+    /**
+     * Point the editor at page n when it exists (Req. 6.1 / 7.1: the page
+     * being edited is always the page being displayed). Clears the cursor
+     * and selection so stale coordinates never edit a hidden page.
+     * @returns {boolean} true when the page exists
+     */
+    setActivePage(n) {
+      if (getPage(state.current, n) === undefined) {
+        return false;
+      }
+      state.activePage = n;
+      state.cursor = null;
+      state.selection = null;
+      return true;
+    },
+
     /** Req. 6.4: remove a page. Clears the cursor if the active page goes. */
     deletePage(n) {
       modelDeletePage(state.current, n);

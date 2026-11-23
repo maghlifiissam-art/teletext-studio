@@ -108,13 +108,17 @@ async function bootstrap() {
       actions.render();
     },
     goTo: (n) => {
-      navigator.goTo(n);
+      const r = navigator.goTo(n);
+      if (r.ok) {
+        editor.setActivePage(r.current);
+      }
       actions.render();
     },
     newPage: () => {
       if (nextAvailableNumber(editor.state.current) !== null) {
         const n = editor.createPage();
         navigator.goTo(n);
+        editor.setActivePage(n);
         actions.render();
       }
     },
@@ -123,6 +127,7 @@ async function bootstrap() {
       const remaining = [...editor.state.current.pages.keys()];
       if (remaining.length > 0) {
         navigator.goTo(remaining[0]);
+        editor.setActivePage(remaining[0]);
       }
       actions.render();
     },
