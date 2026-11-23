@@ -60,16 +60,17 @@ spec-driven workflow:
   `requirements.md` (35 acceptance criteria in EARS notation), `design.md`
   and `tasks.md` (16 implementation tasks) — was produced in Kiro sessions
   and drives the whole implementation.
-- **Implemented with Kiro**: project scaffolding, the pure data model
-  (`scripts/model.js`) with its 11 property-based tests, and the canvas
-  renderer (`scripts/renderer.js`) with its property tests (Kiro tasks 1-4,
-  44 passing tests at that point).
-- **Manual completion**: Kiro free-tier monthly quota was exhausted
-  mid-session during task 4. The remaining tasks 4-16 (editor controllers,
-  mosaic input, flash/conceal, navigator, PNG exporter, URL codec, UI
-  wiring, language toggle, responsive CSS and integration) were completed
-  manually; the commit history marks each manual commit. These modules are
-  being reviewed and refined with Kiro after the quota reset, and the
+- **Implemented with Kiro**: project scaffolding and the pure data model
+  (`scripts/model.js`) with its 11 property-based tests (Kiro tasks 1-3),
+  plus the start of the canvas renderer (`scripts/renderer.js`), begun in
+  the same Kiro session (task 4) before the quota ran out.
+- **Manual completion**: the Kiro free-tier monthly quota was exhausted
+  mid-session during task 4. The renderer and its property tests were
+  finished manually, and tasks 5-16 (flash controller, editor and mosaic
+  input, navigator, PNG exporter, URL codec, UI wiring, language toggle,
+  responsive CSS and integration) were implemented manually; manual commits
+  from task 8 onward are marked in their messages. These modules will be
+  reviewed and refined with Kiro once the monthly quota resets, and the
   property tests designed in the Kiro spec phase cover every module.
 
 ## Tech
