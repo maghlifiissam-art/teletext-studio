@@ -347,9 +347,14 @@ body.tt-app[dir="rtl"] {
   flex-direction: row-reverse;
 }
 
-/* Arabic text within a cell renders right-to-left.                    */
+/* The authored teletext page is a fixed 40x24 coordinate grid: a UI
+   language switch must never mirror cell coordinates or page content,
+   so the canvas always lays out left-to-right. */
+.tt-page-canvas {
+  direction: ltr;
+}
+/* Arabic characters within a cell still shape right-to-left via bidi. */
 [dir="rtl"] .tt-page-canvas .tt-cell {
-  direction: rtl;
   unicode-bidi: plaintext;
 }
 
